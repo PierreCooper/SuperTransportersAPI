@@ -27,7 +27,7 @@ class TransportersController < ApplicationController
       if carrier.save
         @transporter.carriers << carrier
       else
-        render json: carrier.errors, status: :unprocessable_entity
+        render json: carrier.errors, status: :unprocessable_entity and return
       end
     end
     if @transporter.save
