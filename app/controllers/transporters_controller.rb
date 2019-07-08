@@ -59,6 +59,12 @@ class TransportersController < ApplicationController
     end
   end
 
+  def get_by_postal_codes
+    @transporters = Transporter.order(:postal_codes)
+
+    render json: @transporters
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.

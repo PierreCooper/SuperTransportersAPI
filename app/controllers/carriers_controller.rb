@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class CarriersController < ApplicationController
-  before_action :set_carrier, only: [:show, :update, :destroy]
+  before_action :set_carrier, only: %i[show update destroy]
 
   # GET /carriers
   def index
@@ -41,21 +43,27 @@ class CarriersController < ApplicationController
   def update_tracking
     @carrier = Carrier.find(params[:carrier_id])
     if @carrier
-      if @carrier.tracking.nil?
-        tracking = Tracking.new(tracking_params)
-        if tracking.save
-          @carrier.tracking = tracking
-        else
-          render json: tracking.errors, status: :unprocessable_entity and return
-        end
+      tracking = Tracking.new(tracking_params)
+      if tracking.save
+        @carrier.trackings << tracking
       else
-        @carrier.tracking.update(tracking_params)
+        render(json: tracking.errors, status: :unprocessable_entity) && return
       end
-      if @carrier.save
-        render json: @carrier.tracking
-      end
+      render json: @carrier.trackings if @carrier.save
     else
       render json: @carrier.errors, status: :unprocessable_entity
+    end
+  end
+
+  def passed_by
+    if params[:latitude] && params[:longitude]
+      @carriers = Carrier.joins(:trackings).where(
+        trackings: { latitude: params[:latitude],
+                     longitude: params[:longitude] }
+      )
+      render json: @carriers
+    else
+      render json: 'Parameters incomplete', status: :unprocessable_entity
     end
   end
 

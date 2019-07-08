@@ -10,7 +10,7 @@ class Carrier < ApplicationRecord
   has_many :transporter_carriers
   has_many :transporters, through: :transporter_carriers
 
-  has_one :tracking, dependent: :destroy
+  has_many :trackings, dependent: :destroy
 
   def has_one_valid_licence
     if !has_driver_licence_a && !has_driver_licence_b && !has_driver_licence_c
