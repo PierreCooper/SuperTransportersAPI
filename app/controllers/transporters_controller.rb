@@ -18,10 +18,9 @@ class TransportersController < ApplicationController
   # POST /transporters
   def create
     hash = transporter_params
-    puts 'SAUCISSE'
-    puts hash
     hash = JSON.parse(transporter_params) if hash.is_a?(String)
     @transporter = Transporter.new(hash.except(:carriers))
+
     hash["carriers"].each do |c|
       carrier = Carrier.new(c)
       if carrier.save
@@ -49,6 +48,15 @@ class TransportersController < ApplicationController
   # DELETE /transporters/1
   def destroy
     @transporter.destroy
+  end
+
+  def get_carriers
+    @transporter = Transporter.find(params[:transporter_id])
+    if
+      render json: @transporter.carriers
+    else
+      render json: @transporter.errors, status: :unprocessable_entity
+    end
   end
 
   private
