@@ -10,6 +10,8 @@ class Carrier < ApplicationRecord
   has_many :transporter_carriers
   has_many :transporters, through: :transporter_carriers
 
+  has_one :tracking, dependent: :destroy
+
   def has_one_valid_licence
     if !has_driver_licence_a && !has_driver_licence_b && !has_driver_licence_c
       errors.add(:has_driver_licence_a, "Carrier must have at least one driver licence")

@@ -38,14 +38,40 @@ class CarriersController < ApplicationController
     @carrier.destroy
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_carrier
-      @carrier = Carrier.find(params[:id])
+  def update_tracking
+    @carrier = Carrier.find(params[:carrier_id])
+    if @carrier
+      if @carrier.tracking.nil?
+        tracking = Tracking.new(tracking_params)
+        if tracking.save
+          @carrier.tracking = tracking
+        else
+          render json: tracking.errors, status: :unprocessable_entity and return
+        end
+      else
+        @carrier.tracking.update(tracking_params)
+      end
+      if @carrier.save
+        render json: @carrier.tracking
+      end
+    else
+      render json: @carrier.errors, status: :unprocessable_entity
     end
+  end
 
-    # Only allow a trusted parameter "white list" through.
-    def carrier_params
-      params.require(:carrier).permit(:name, :age, :has_driver_licence_a, :has_driver_licence_b, :has_driver_licence_c)
-    end
+  private
+
+  # Use callbacks to share common setup or constraints between actions.
+  def set_carrier
+    @carrier = Carrier.find(params[:id])
+  end
+
+  def tracking_params
+    params.require(:tracking).permit(:longitude, :latitude, :altitude)
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def carrier_params
+    params.require(:carrier).permit(:name, :age, :has_driver_licence_a, :has_driver_licence_b, :has_driver_licence_c)
+  end
 end
